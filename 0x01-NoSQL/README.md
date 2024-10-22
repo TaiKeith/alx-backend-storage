@@ -58,7 +58,8 @@ $ sudo mkdir -p /data/db
 ```
 
 Or if `/etc/init.d/mongod` is missing, please find here an example of the file:
-
+<details>
+  <summary>Click to expand</summary>
 ```
 #!/bin/sh
 ### BEGIN INIT INFO
@@ -294,3 +295,4 @@ esac
 
 exit 0
 ```
+</details>
