@@ -9,11 +9,9 @@ from functools import wraps
 from typing import Callable
 
 
-# Redis setup
 cache = redis.Redis()
 
 
-# Decorator for caching
 def cache_page(func: Callable) -> Callable:
     """
     Caches the output of the fetched data
@@ -29,7 +27,7 @@ def cache_page(func: Callable) -> Callable:
         print(f"Cache miss for URL: {url}. Fetching from the web...")
 
         content = func(url)
-        cache.setex(f"content:{url}", 60, content)  # Cache expiration set to 60 seconds
+        cache.setex(f"content:{url}", 60, content)
         return content
     return wrapper
 
