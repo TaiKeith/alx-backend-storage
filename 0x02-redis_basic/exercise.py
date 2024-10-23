@@ -23,15 +23,12 @@ def count_calls(method: Callable) -> Callable:
         Wrapper function that increments the call count in Redis
         and executes the original method.
         """
-        # Use the method's qualified name as the key
-        key = method.__qualname__
-
         # Increment the call count in Redis
-        self._redis.incr(key)
+        if isinstance(self._redis, redis.Redis):
+            self._redis.incr(method.__qualname__)
 
         # Call the original method and return its result
         return method(self, *args, **kwargs)
-
     return wrapper
 
 def call_history(method: Callable) -> Callable:
