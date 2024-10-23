@@ -7,11 +7,10 @@ import requests
 import redis
 from functools import wraps
 from typing import Callable
-import time
 
 
 # Redis setup
-cache = redis.Redis(host='localhost', port=6379, db=0)
+cache = redis.Redis()
 
 
 # Decorator for caching
