@@ -7,7 +7,6 @@ import requests
 import redis
 from functools import wraps
 from typing import Callable
-import time
 
 
 # Redis setup
