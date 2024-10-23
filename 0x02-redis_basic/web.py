@@ -41,11 +41,3 @@ def get_page(url: str) -> str:
     """
     response = requests.get(url)
     return response.text
-
-# Test the function with the decorator
-if __name__ == "__main__":
-    """Test the function"""
-    url = 'http://slowwly.robertomurray.co.uk/delay/5000/url/http://www.google.co.uk'
-    print(get_page(url))
-    time.sleep(5)  # Wait and test cache hit
-    print(get_page(url))  # Cache hit expected
