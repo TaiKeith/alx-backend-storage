@@ -5,41 +5,44 @@ the HTML content of a particular URL and returns it.
 """
 import requests
 import redis
-from functools import lru_cache
+from functools import wraps
+from typing import Callable
 
 
-# Dictionary to track URL accesses
-url_access_count = {}
+# Redis setup
+cache = redis.Redis()
 
 
-# Decorator to cache results and track URL accesses
-def cache_and_track(func):
-    @lru_cache(maxsize=100)
-    def wrapper(url):
-        # Make the request to the URL and fetch the content
-        response = requests.get(url)
-        page_content = response.text
+# Decorator for caching
+def cache_page(func: Callable) -> Callable:
+    """
+    Caches the output of the fetched data
+    """
+    @wraps(func)
+    def wrapper(url: str) -> str:
+        cache.incr(f"count:{url}")
+        content = cache.get(f"content:{url}")
+        if content:
+            return content.decode('utf-8')
 
-        # Update the URL access count
-        url_access_count[url] = url_access_count.get(url, 0) + 1
+        # Log a cache miss
+        print(f"Cache miss for URL: {url}. Fetching from the web...")
 
-        time.sleep(10)  # Simulate slow response
-
-        return page_content
-
+        content = func(url)
+        cache.setex(f"content:{url}", 60, content)  # Cache expiration set to 60 seconds
+        return content
     return wrapper
 
 
-# Function to get the page content (decorated with cache_and_track)
-@cache_and_track
+@cache_page
 def get_page(url: str) -> str:
-    return url
-
-
-# Example usage
-if __name__ == "__main__":
-    url_ = "http://slowwly.robertomurray.co.uk/delay/1000/url/"
-    url = f"{url_}http://www.google.com"
-    print(get_page(url))
-    print(get_page(url))
-    print(f"Access count for {url}: {url_access_count[url]}")
+    """
+    Returns the content of a URL after caching the request's response
+    and tracking the request
+    """
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an error for bad status codes
+        return response.text
+    except requests.RequestException as e:
+        return f"Error fetching the page: {e}"
