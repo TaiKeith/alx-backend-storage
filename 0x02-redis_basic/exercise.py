@@ -96,7 +96,8 @@ def replay(method: Callable) -> None:
 
     # Print the inputs and outputs in the desired format
     for inp, outp in zip(inputs, outputs):
-        print(f"{method_name}(*{inp.decode('utf-8')}) -> {outp.decode('utf-8')}")
+        print(f"{method_name}(*{inp.decode('utf-8')}) ->
+              {outp.decode('utf-8')}")
 
 
 class Cache:
