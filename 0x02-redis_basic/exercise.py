@@ -4,7 +4,7 @@ This module contains functions and methods for Redis NoSQL data storage
 """
 import redis
 import uuid
-from typing import Union, Callable, Optional
+from typing import Union, Callable, Optional, Any
 from functools import wraps
 
 
@@ -18,7 +18,7 @@ def count_calls(method: Callable) -> Callable:
         Callable: The wrapped method with call counting
     """
     @wraps(method)
-    def wrapper(self, *args, **kwargs):
+    def wrapper(self, *args, **kwargs) -> Any:
         """
         Wrapper function that increments the call count in Redis
         and executes the original method.
