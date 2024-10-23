@@ -18,17 +18,23 @@ def cache_page(func: Callable) -> Callable:
     """
     @wraps(func)
     def wrapper(url: str) -> str:
-        cache.incr(f"count:{url}")
-        content = cache.get(f"content:{url}")
-        if content:
-            return content.decode('utf-8')
+        try:
+            # Check if the result is in the cache
+            cached_page = cache.get(f"content:{url}")
+            if cached_page:
+                print(f"Cache hit for URL: {url}")
+                return cached_page.decode('utf-8')
 
-        # Log a cache miss
-        print(f"Cache miss for URL: {url}. Fetching from the web...")
+            # Fetch and store if not in cache
+            content = func(url)
+            cache.setex(f"content:{url}", 10, content)
+            cache.incr(f"count:{url}")
+            return content
 
-        content = func(url)
-        cache.setex(f"content:{url}", 60, content)
-        return content
+        except requests.RequestException as e:
+            print(f"Error fetching the page: {e}")
+            return "An error occurred while fetching the page."
+
     return wrapper
 
 
