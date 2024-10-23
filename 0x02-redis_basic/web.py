@@ -27,7 +27,6 @@ def cache_page(func: Callable) -> Callable:
             return content.decode('utf-8')
 
         content = func(url)
-        cache.set(f"count:{url}", 0)
         cache.setex(f"content:{url}", 10, content)
         return content
     return wrapper
