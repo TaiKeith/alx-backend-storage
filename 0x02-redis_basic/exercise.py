@@ -4,7 +4,7 @@ This module contains functions and methods for Redis NoSQL data storage
 """
 import redis
 import uuid
-from typing import Union, Callable, Optional, Any
+from typing import Union, Callable, Any
 from functools import wraps
 
 
