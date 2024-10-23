@@ -13,29 +13,30 @@ from typing import Callable
 cache = redis.Redis()
 
 
-# Decorator for caching
-def cache_page(func: Callable) -> Callable:
+def data_cacher(method: Callable) -> Callable:
     """
-    Caches the output of the fetched data
+    Caches the output of fetched data.
     """
-    @wraps(func)
-    def wrapper(url: str) -> str:
-        cache.incr(f"count:{url}")
-        content = cache.get(f"content:{url}")
-        if content:
-            return content.decode('utf-8')
+    @wraps(method)
+    def invoker(url) -> str:
+        """
+        The wrapper function for caching the output.
+        """
+        redis_store.incr(f'count:{url}')
+        result = redis_store.get(f'result:{url}')
+        if result:
+            return result.decode('utf-8')
+        result = method(url)
+        redis_store.set(f'count:{url}', 0)
+        redis_store.setex(f'result:{url}', 10, result)
+        return result
+    return invoker
 
-        content = func(url)
-        cache.setex(f"content:{url}", 10, content)
-        return content
-    return wrapper
 
-
-@cache_page
+@data_cacher
 def get_page(url: str) -> str:
     """
-    Returns the content of a URL after caching the request's response
-    and tracking the request
+    Returns the content of a URL after caching the request's response,
+    and tracking the request.
     """
-    response = requests.get(url)
-    return response.text
+    return requests.get(url).text
